@@ -1,23 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+} from "react-router-dom";
+import Login from "./components/session/Login"
+import fire from "./fire";
+import ListAllNumbers from "./components/phonebook/ListAllNumbers";
+import AddNumber from "./components/phonebook/AddNumber";
+import NotFound from "./components/NotFound";
 
 function App() {
+  const [isLoggedIn,setIsLoggedIn] = useState(false);
+
+    fire.auth.onAuthStateChanged(user=>{
+      return user?setIsLoggedIn(true):setIsLoggedIn(false);
+    });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+    
+    <Router>
+      {isLoggedIn?
+      <div>
+        <a href="/"><span onClick={()=>{fire.auth.signOut()}}>Sign Out</span></a>
+        <Routes>
+          <Route path="/" element={<ListAllNumbers/>}>
+            <Route path="/add-number" element={<AddNumber/>} />
+          </Route>
+          <Route path="*" element={<NotFound/>} />
+        </Routes>
+      </div>
+      :
+        <Routes>
+          <Route path="/" element={<Login/>} />
+          <Route path="*" element={<NotFound/>} />
+        </Routes>
+      }
+    </Router>
+      
     </div>
   );
 }
